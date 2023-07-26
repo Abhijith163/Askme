@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load user_likes_answer %}
+{% block content %}
+<style>
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+  a.answer {
+    text-decoration: none;
+  }
+  a.likes {
+    text-decoration: none;
+  }
+</style>
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      
+      <div class="col-lg-4">
+        <form action="" method="post"> {% csrf_token %}
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Type your answer</label>
+            <textarea class="form-control" name="answer" id="exampleFormControlTextarea1" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2">Answer</button>
+          {% if messages %}
+            {% for msg in messages %}
+              <p class="text-success text-center mt-3 mb-0">{{ msg }}</p>
+            {% endfor %}
+          {% endif %}
+        </form>
+        
+      </div> 
+      <div class="col-lg-8">
+        <div class="card mb-2 p-0 mx-2">
+          <div class="card-body">
+            <h5 class="card-title">{{ question.title|title }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ question.user.username }}</h6>
+            <p class="card-text mb-0">{{ question.body }}</p>
+          </div>
+          <div class="card-footer text-muted">
+            <span>{{ question.created_at|date:"M Y h:i:A" }}</span>
+          </div>
+        </div>
+        {% if answers %}
+        <h4 class="mt-3">Answers</h4>
+          {% for answer in answers %}
+          <div class="card mb-2">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted d-flex justify-content-between">
+                <span>{{ answer.user.username }}</span> <span>{{ answer.created_at|date:"M Y h:i:A" }}</span>
+              </h6>
+              <p class="card-text mb-2">{{ answer.body }}</p>
+              {% if answer.user != request.user %}
+              <a href="/like_answer/{{ answer.id }}" class="likes">
+                <button class="btn btn-outline-info">
+                  {% if request.user|user_likes_answer:answer %}Unlike{% else %}Like{% endif %}
+                </button>
+              </a>
+              {% endif %}
+              <span class="ms-2">{{ answer.likes.count }} Likes</span>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+      
+    </div>
+    
+{% endblock %}
